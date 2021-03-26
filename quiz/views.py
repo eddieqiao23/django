@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 
 from .models import Question, Quiz
@@ -13,7 +13,7 @@ def index(request):
     return render(request, 'quiz/index.html', context)
 
 def quiz_details(request, quiz_id):
-    quiz = Quiz.objects.get(pk = quiz_id)
+    quiz = get_object_or_404(Quiz, pk = quiz_id)
 
     context = {
         'curr_quiz': quiz,
