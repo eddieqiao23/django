@@ -5,13 +5,9 @@ from .models import Question, Quiz
 
 def index(request):
     quizzes = Quiz.objects.all()
-    links = []
-    for i in range(len(quizzes)):
-        links.append("http://127.0.0.1:8000/quiz/%d/" % i)
 
     context = {
         'quizzes': quizzes,
-        'links': links,
     }
     # return HttpResponse(output)
     return render(request, 'quiz/index.html', context)
