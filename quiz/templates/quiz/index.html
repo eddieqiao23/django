@@ -1,19 +1,66 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
     <title>Quizzes</title>
+
+    <!-- This section (4 items) includes Bootstrap 4 -->
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+      <!-- jQuery library -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      <!-- Popper JS -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+      <!-- Latest compiled JavaScript -->
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
   </head>
+
   <body>
-    <h1>Quizzes</h1>
+    <div class = "container">
+      <h1>Quizzes</h1>
 
-    <div id = "questions"> </div>
+      {% if loggedIn %}
+        <h3>Welcome, {{ user.first_name }} {{ user.last_name }}</h3>
 
-    <p>Welcome to the quiz index! Choose the quiz you want to take.</p>
-    {% for quiz in quizzes %}
-      <a href = {{quiz.id}}>{{quiz.name}}</a>
+        <!-- If logged in, then give them option to log out -->
+        <form method = "POST">
+          {% csrf_token %}
+          <input type = "hidden" name = "logout" value = "logout"> </input>
+          <button type="submit" class="btn btn-danger">Logout</button>
+        </form>
+
+      {% else %}
+
+        <!-- If not logged in, then give them option to log in -->
+
+        <form method = "POST">
+          {% csrf_token %}
+          {% if failed %}
+            <div class="alert alert-danger">
+              Login information was incorrect.
+            </div>
+          {% endif %}
+          <div class="form-group">
+            <label for="inputUsername">Username</label>
+            <input type="text" class="form-control" name="inputUsername" id="inputUsername" />
+          </div>
+
+          <div class="form-group">
+            <label for="inputPassword">Password</label>
+            <input type="password" class="form-control" name="inputPassword" id="inputPassword" />
+          </div>
+
+          <button type="submit" class="btn btn-danger">Login</button>
+        </form>
+      {% endif %}
+
       <br />
-    {% endfor %}
+      <p>Welcome to the quiz index! Choose the quiz you want to take.</p>
+      {% for quiz in quizzes %}
+        <a href = {{quiz.id}}>{{quiz.name}}</a>
+        <br />
+      {% endfor %}
 
+    </div>
   </body>
 </html>
