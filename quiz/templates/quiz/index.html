@@ -29,6 +29,14 @@
           <button type="submit" class="btn btn-danger">Logout</button>
         </form>
 
+        <br />
+        <p>Welcome to the quiz index! Choose the quiz you want to take.</p>
+        <ul class = "list-group">
+          {% for quiz in quizzes %}
+            <li class = "list-group-item"><a href = {{quiz.id}}>{{quiz.name}}</a></li>
+          {% endfor %}
+        </ul>
+
       {% else %}
 
         <!-- If not logged in, then give them option to log in -->
@@ -51,15 +59,11 @@
           </div>
 
           <button type="submit" class="btn btn-danger">Login</button>
+
+          <br />
+          <p>Please login to see the possible quizzes.</p>
         </form>
       {% endif %}
-
-      <br />
-      <p>Welcome to the quiz index! Choose the quiz you want to take.</p>
-      {% for quiz in quizzes %}
-        <a href = {{quiz.id}}>{{quiz.name}}</a>
-        <br />
-      {% endfor %}
 
     </div>
   </body>

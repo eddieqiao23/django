@@ -1,21 +1,36 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
     <title>Quiz</title>
+      <!-- This section (4 items) includes Bootstrap 4 -->
+
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+      <!-- jQuery library -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      <!-- Popper JS -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+      <!-- Latest compiled JavaScript -->
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   </head>
+
   <body>
-    <h1> {{curr_quiz.name}} </h1>
+    <div class = "container">
+      <h1> {{curr_quiz.name}} </h1>
 
-    <div id = "questions"> </div>
+      <div id = "questions"> </div>
 
-    <form>
-      {% for question in curr_quiz.question_set.all %}
-        Question {{ forloop.counter }}: {{question.question_statement}} <br /> <br />
-        <input type = "text" id = "test" name = "test"><br />
+      <!-- Make this a lot more AESTHETIC -->
+      <form method = "GET">
+        {% for question in curr_quiz.question_set.all %}
+          Question {{ forloop.counter }}: {{question.question_statement}} <br /> <br />
+          <input type = "text" id = "test" name = "test"><br />
+          <br />
+        {% endfor %}
         <br />
-      {% endfor %}
-      <br />
-      <button type = "submit">Submit</button>
+
+        <button type="submit" class="btn btn-success">Submit</button>
+      </form>
+    </div>
   </body>
 </html>
