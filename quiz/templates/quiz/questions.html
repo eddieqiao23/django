@@ -20,16 +20,19 @@
 
       <div id = "questions"> </div>
 
-      <!-- Make this a lot more AESTHETIC -->
       <form method = "GET">
         {% for question in curr_quiz.question_set.all %}
-          Question {{ forloop.counter }}: {{question.question_statement}} <br /> <br />
-          <input type = "text" id = "test" name = "test"><br />
-          <br />
-        {% endfor %}
-        <br />
+          <div class = "form-group">
+            <label for = "question">
+              Question {{ forloop.counter }}: {{question.question_statement}}
+            </label>
 
-        <button type="submit" class="btn btn-success">Submit</button>
+            <input type = "text" name = "answer{{question.id}}" class = "form-control">
+          </div>
+        {% endfor %}
+
+        <input type = "hidden" name = "userSubmitting" value = "{{ user.username }}" />
+        <button type = "submit" class = "btn btn-success">Submit</button>
       </form>
     </div>
   </body>
