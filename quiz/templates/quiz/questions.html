@@ -20,7 +20,11 @@
 
       <div id = "questions"> </div>
 
-      <form method = "GET">
+      <form method = "POST">
+        {% csrf_token %}
+
+        <h4>You are logged in as {{ user.username }}</h4>
+
         {% for question in curr_quiz.question_set.all %}
           <div class = "form-group">
             <label for = "question">

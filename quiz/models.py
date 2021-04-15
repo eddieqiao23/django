@@ -23,5 +23,9 @@ class Submission(models.Model):
     question = models.ForeignKey(Question, on_delete = models.CASCADE)
     sub_answer = models.IntegerField(default = 0)
 
+    @property
+    def is_correct(self):
+        return self.sub_answer == self.question.answer
+
     def __str__(self):
         return self.user.username + " submitted " + str(self.sub_answer) + " to question " + str(self.question.id)
