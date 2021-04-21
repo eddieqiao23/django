@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
+from django.urls import reverse
 
 from .models import Question, Quiz, Submission
 
@@ -15,7 +16,7 @@ def index(request):
 
     failed = False
 
-    if request.POST:
+    if request.method == "POST":
         if 'inputUsername' in request.POST.keys():
             user = authenticate(username=request.POST['inputUsername'], password=request.POST['inputPassword'])
             if user is not None:
@@ -25,6 +26,7 @@ def index(request):
                 # failed login
         elif 'logout' in request.POST.keys():
             logout(request)
+
     if request.user.is_authenticated:
         loggedIn = True
     else:
@@ -44,7 +46,9 @@ def index(request):
 def quiz_details(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk = quiz_id)
 
-    if request.POST:
+    if request.method == "POST":
+        return HttpResponseRedirect(reverse('quiz:results', args=(quiz_id,)))
+
         print(request.POST)
         for q in quiz.question_set.all():
             print("LSDKFJSLKJDF" + str(q.id))
