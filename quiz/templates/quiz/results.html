@@ -19,11 +19,15 @@
       <h1>{{curr_quiz.name}} Results</h1>
 
       {% for sub in recent_subs %}
+        Question {{forloop.counter}}: {{sub.question.question_statement}} <br /> <br />
+        You submitted {{sub.sub_answer}}.
+        The right answer was {{sub.question.answer}}.
         {%if sub.is_correct %}
           CORRECT
         {% else %}
           WRONG
         {% endif %}
+        <br /> <br />
       {% endfor %}
     </div>
   </body>

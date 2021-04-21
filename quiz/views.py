@@ -47,9 +47,6 @@ def quiz_details(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk = quiz_id)
 
     if request.method == "POST":
-        return HttpResponseRedirect(reverse('quiz:results', args=(quiz_id,)))
-
-        print(request.POST)
         for q in quiz.question_set.all():
             print("LSDKFJSLKJDF" + str(q.id))
             username = request.POST['userSubmitting']
@@ -64,16 +61,8 @@ def quiz_details(request, quiz_id):
 
             newSub.save()
 
-        curr_quiz = Quiz.objects.filter(id=quiz_id)[0]
-        quiz_questions = curr_quiz.question_set.all()
+        return HttpResponseRedirect(reverse('quiz:results', args=(quiz_id,)))
 
-        quiz_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id)
-        recent_subs = quiz_subs.order_by('-sub_time')[:quiz_questions.count()]
-        context = {
-            'recent_subs': recent_subs,
-        }
-        template = loader.get_template('quiz/results.html')
-        return HttpResponse(template.render(context, request))
 
     context = {
         'curr_quiz': quiz,
@@ -91,16 +80,7 @@ def results(request, quiz_id):
     # Gets most recent submissions by this user for that quiz
     # Should be correct because for a quiz with n questions, there are n submissions in that order
     quiz_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id)
-    recent_subs = quiz_subs.order_by('-sub_time')
-
-    # for i in range(len(relevant_subs)):
-    #     sub = relevant_subs[i]
-    #     user_answers.append(sub.sub_answer)
-    #     correct_answers.append(quiz_questions[i].answer)
-    #     if sub.sub_answer == quiz_questions[i].answer:
-    #         points.append(1) # Maybe allow for weighted questions
-    #     else:
-    #         points.append(0)
+    recent_subs = quiz_subs.order_by('sub_time')[len(quiz_subs)-len(quiz_questions):len(quiz_subs)]
 
     print(recent_subs)
 
