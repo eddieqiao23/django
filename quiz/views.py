@@ -74,18 +74,26 @@ def results_index(request):
     return HttpResponse("results index...")
 
 def results(request, quiz_id):
+    if request.method == "POST":
+        print("LSKDJFKLSDFSKJDFJK")
+        return HttpResponseRedirect(reverse('quiz:index'))
+
+
     curr_quiz = Quiz.objects.filter(id=quiz_id)[0]
     quiz_questions = curr_quiz.question_set.all()
 
     # Gets most recent submissions by this user for that quiz
     # Should be correct because for a quiz with n questions, there are n submissions in that order
     quiz_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id)
-    recent_subs = quiz_subs.order_by('sub_time')[len(quiz_subs)-len(quiz_questions):len(quiz_subs)]
-
-    print(recent_subs)
+    recent_subs = quiz_subs.order_by('sub_time')[len(quiz_subs) - len(quiz_questions):len(quiz_subs)]
+    score = 0
+    for sub in recent_subs:
+        if sub.is_correct:
+            score += 1
 
     context = {
         'recent_subs': recent_subs,
+        'score': score,
     }
 
     template = loader.get_template('quiz/results.html')
