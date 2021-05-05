@@ -16,7 +16,9 @@ def index(request):
 
     failed = False
 
-    if request.method == "POST":
+    if request.method == "POST" and "signup" in request.POST.keys():
+        return HttpResponse("SIGNUP")
+    elif request.method == "POST":
         if 'inputUsername' in request.POST.keys():
             user = authenticate(username=request.POST['inputUsername'], password=request.POST['inputPassword'])
             if user is not None:
@@ -45,28 +47,49 @@ def index(request):
 
 def quiz_details(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk = quiz_id)
+    past_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id)
+
+    subs_left = quiz.max_subs - past_subs.count() // quiz.quiz_length
+    print(quiz.quiz_length)
+    print("BAH", subs_left)
 
     if request.method == "POST":
+        validSubmission = True
         for q in quiz.question_set.all():
-            print("LSDKFJSLKJDF" + str(q.id))
-            username = request.POST['userSubmitting']
-            print("username is: " + username)
-            user = User.objects.filter(username = username)[0]
-            newSub = Submission(
-                user = user,
-                sub_time = timezone.now(),
-                question = q,
-                sub_answer = request.POST['answer' + str(q.id)],
-            )
+            if request.POST['answer' + str(q.id)] == "":
+                validSubmission = False
 
-            newSub.save()
+        if validSubmission:
+            for q in quiz.question_set.all():
+                print("LSDKFJSLKJDF" + str(q.id))
+                username = request.POST['userSubmitting']
+                print("username is: " + username)
+                user = User.objects.filter(username = username)[0]
+                newSub = Submission(
+                    user = user,
+                    sub_time = timezone.now(),
+                    question = q,
+                    sub_answer = request.POST["answer" + str(q.id)],
+                )
 
-        return HttpResponseRedirect(reverse('quiz:results', args=(quiz_id,)))
+                newSub.save()
+
+            return HttpResponseRedirect(reverse('quiz:results', args=(quiz_id,)))
+    else:
+        context = {
+            'curr_quiz': quiz,
+            'subs_left': subs_left,
+            'user': request.user,
+            'validSubmission': False,
+        }
+        return render(request, 'quiz/questions.html', context)
 
 
     context = {
         'curr_quiz': quiz,
-        'user': request.user
+        'subs_left': subs_left,
+        'user': request.user,
+        'validSubmission': True,
     }
     return render(request, 'quiz/questions.html', context)
 
@@ -75,9 +98,7 @@ def results_index(request):
 
 def results(request, quiz_id):
     if request.method == "POST":
-        print("LSKDJFKLSDFSKJDFJK")
         return HttpResponseRedirect(reverse('quiz:index'))
-
 
     curr_quiz = Quiz.objects.filter(id=quiz_id)[0]
     quiz_questions = curr_quiz.question_set.all()

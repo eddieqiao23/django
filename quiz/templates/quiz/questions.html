@@ -5,7 +5,7 @@
       <!-- This section (4 items) includes Bootstrap 4 -->
 
       <!-- Latest compiled and minified CSS -->
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
       <!-- jQuery library -->
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
       <!-- Popper JS -->
@@ -16,28 +16,39 @@
 
   <body>
     <div class = "container">
-      <h1> {{curr_quiz.name}} </h1>
+      <h1>{{curr_quiz.name}}</h1>
 
-      <div id = "questions"> </div>
+      <h3>Submissions left: {{ subs_left }}</h3>
 
-      <form method = "POST">
-        {% csrf_token %}
+      <h4>Username: {{user.username}}</h4>
 
-        <h4>You are logged in as {{ user.username }}</h4>
+      {% if subs_left > 0 %}
+        <div id = "questions"> </div>
 
-        {% for question in curr_quiz.question_set.all %}
-          <div class = "form-group">
-            <label for = "question">
-              Question {{ forloop.counter }}: {{question.question_statement}}
-            </label>
+        <form method = "POST">
+          {% csrf_token %}
 
-            <input type = "text" name = "answer{{question.id}}" class = "form-control">
-          </div>
-        {% endfor %}
+          {% for question in curr_quiz.question_set.all %}
+            <div class = "form-group">
+              <label for = "question">
+                Question {{ forloop.counter }}: {{question.question_statement}}
+              </label>
 
-        <input type = "hidden" name = "userSubmitting" value = "{{ user.username }}" />
-        <button type = "submit" class = "btn btn-success">Submit</button>
-      </form>
+              <input type = "text" name = "answer{{question.id}}" class = "form-control">
+            </div>
+          {% endfor %}
+
+          <input type = "hidden" name = "userSubmitting" value = "{{ user.username }}" />
+          {% if validSubmission %}
+            <div class="alert alert-danger">
+              Please enter an answer to every question.
+            </div>
+          {% endif %}
+          <button type = "submit" class = "btn btn-success">Submit</button>
+        </form>
+      {% else %}
+        You are not allowed to submit to this quiz.
+      {% endif %}
     </div>
   </body>
 </html>

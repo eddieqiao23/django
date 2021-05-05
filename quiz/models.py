@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 
 class Quiz(models.Model):
     name = models.CharField(max_length=1000)
+    max_subs = models.IntegerField(default = 99999)
+
+    @property
+    def quiz_length(self):
+        return Question.objects.filter(quiz = self).count()
 
     def __str__(self):
         return self.name
