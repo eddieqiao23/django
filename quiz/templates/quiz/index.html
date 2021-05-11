@@ -12,7 +12,6 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
       <!-- Latest compiled JavaScript -->
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-
   </head>
 
   <body>
@@ -20,7 +19,7 @@
       <h1>Quizzes</h1>
 
       {% if loggedIn %}
-        <h3>Welcome, {{ user.first_name }} {{ user.last_name }}</h3>
+          <h3>Welcome, {{ user.first_name }} {{ user.last_name }}</h3>
 
         <!-- If logged in, then give them option to log out -->
         <form method = "POST">
@@ -32,6 +31,7 @@
 
         <br />
         <p>Welcome to the quiz index! Choose the quiz you want to take.</p>
+
         <ul class = "list-group">
           {% for quiz in quizzes %}
             <li class = "list-group-item"><a href = {{quiz.id}}>{{quiz.name}}</a></li>
