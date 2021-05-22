@@ -6,8 +6,9 @@ from django.urls import include, path
 app_name = "quiz"
 urlpatterns = [
     path('', views.index, name='index'),
+    path('signup/', views.signup, name = 'signup'),
     # ex: /quiz/5/
-    path('<int:quiz_id>/', views.quiz_details, name='quiz_details'),
+    path('<int:quiz_id>/', views.quiz_details, name = 'quiz_details'),
     # ex: /quiz/3/results/
     path('results/', views.results_index, name = 'results_index'),
     path('<int:quiz_id>/results', views.results, name = 'results'),

@@ -17,7 +17,10 @@ def index(request):
     failed = False
 
     if request.method == "POST" and "signup" in request.POST.keys():
-        return HttpResponse("SIGNUP")
+        template = loader.get_template('quiz/signup.html')
+        context = {}
+
+        return HttpResponse(template.render(context, request))
     elif request.method == "POST":
         if 'inputUsername' in request.POST.keys():
             user = authenticate(username=request.POST['inputUsername'], password=request.POST['inputPassword'])
@@ -41,6 +44,72 @@ def index(request):
         'loggedIn': loggedIn,
         'user': request.user,
         'failed': failed,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+def signup(request):
+    print("hihi")
+    template = loader.get_template('quiz/signup.html')
+    diffPassword = False
+    duplicateUser = False
+    noUsername = False
+    noPassword = False
+
+    if request.method == "POST":
+        print("hihi")
+        if request.POST["inputPassword"] != request.POST["inputPasswordConfirm"]:
+            diffPassword = True
+        if User.objects.filter(username = request.POST["inputUsername"]).count() != 0:
+            duplicateUser = True
+        if len(request.POST["inputUsername"]) == 0:
+            noUsername = True
+        if len(request.POST["inputPassword"]) == 0 and len(request.POST["inputPasswordConfirm"]) == 0:
+            noPassword = True
+
+        context = {
+            'diffPassword': diffPassword,
+            'duplicateUser': duplicateUser,
+            'noUsername': noUsername,
+            'noPassword': noPassword
+        }
+        print(context)
+
+        if (not diffPassword) and (not duplicateUser) and (not noUsername) and (not noPassword):
+            print("ACC IS MADE")
+            user = User.objects.create_user(
+                username = request.POST["inputUsername"],
+                password = request.POST["inputPassword"],
+                first_name = request.POST["inputFirstName"],
+                last_name = request.POST["inputLastName"]
+            )
+            user.save()
+
+            login_user = authenticate(username=request.POST['inputUsername'], password=request.POST['inputPassword'])
+
+            if login_user is not None:
+                login(request, login_user)
+            else:
+                print("SLKDFJLKSDFLKJSDJKF")
+
+            template = loader.get_template('quiz/index.html')
+
+        return HttpResponse(template.render(context, request))
+    else:
+        context = {
+            'diffPassword': False,
+            'duplicateUser': False,
+            'noUsername': False,
+            'noPassword': False
+        }
+
+        return HttpResponse(template.render(context, request))
+
+    context = {
+        'diffPassword': False,
+        'duplicateUser': False,
+        'noUsername': False,
+        'noPassword': False
     }
 
     return HttpResponse(template.render(context, request))
