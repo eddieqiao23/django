@@ -45,17 +45,17 @@
                 Question {{ forloop.counter }}: <span class="math display">{{question.question_statement}}</span>
               </label>
 
-              <input type = "text" name = "answer{{question.id}}" class = "form-control">
+              {% if question.last_sub.final_sub %}
+                <input type = "text" name = "answer{{question.id}}" class = "form-control">
+              {% else %}
+                <input type = "text" name = "answer{{question.id}}" class = "form-control" value = "{{question.last_sub.sub_answer}}">
+              {% endif %}
             </div>
           {% endfor %}
 
           <input type = "hidden" name = "userSubmitting" value = "{{ user.username }}" />
-          {% if validSubmission %}
-            <div class="alert alert-danger">
-              Please enter an answer to every question.
-            </div>
-          {% endif %}
-          <button type = "submit" class = "btn btn-success">Submit</button>
+          <button type = "submit" class = "btn btn-secondary" name = "save">Save</button>
+          <button type = "submit" class = "btn btn-success" name = "submit">Submit</button>
         </form>
       {% else %}
         You are not allowed to submit to this quiz.

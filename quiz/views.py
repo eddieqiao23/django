@@ -20,7 +20,7 @@ def index(request):
         template = loader.get_template('quiz/signup.html')
         context = {}
 
-        return HttpResponse(template.render(context, request))
+        return HttpResponseRedirect(reverse('quiz:signup'))
     elif request.method == "POST":
         if 'inputUsername' in request.POST.keys():
             user = authenticate(username=request.POST['inputUsername'], password=request.POST['inputPassword'])
@@ -80,8 +80,6 @@ def signup(request):
             user = User.objects.create_user(
                 username = request.POST["inputUsername"],
                 password = request.POST["inputPassword"],
-                first_name = request.POST["inputFirstName"],
-                last_name = request.POST["inputLastName"]
             )
             user.save()
 
@@ -92,7 +90,7 @@ def signup(request):
             else:
                 print("SLKDFJLKSDFLKJSDJKF")
 
-            template = loader.get_template('quiz/index.html')
+            return HttpResponseRedirect(reverse('quiz:index'))
 
         return HttpResponse(template.render(context, request))
     else:
@@ -116,33 +114,34 @@ def signup(request):
 
 def quiz_details(request, quiz_id):
     quiz = get_object_or_404(Quiz, pk = quiz_id)
-    past_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id)
+    past_final_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
 
-    subs_left = quiz.max_subs - past_subs.count() // quiz.quiz_length
-    print(quiz.quiz_length)
-    print("BAH", subs_left)
+    subs_left = quiz.max_subs - past_final_subs.count() // quiz.quiz_length
 
     if request.method == "POST":
-        validSubmission = True
         for q in quiz.question_set.all():
-            if request.POST['answer' + str(q.id)] == "":
-                validSubmission = False
+            username = request.POST['userSubmitting']
+            user = User.objects.filter(username = username)[0]
+            is_final = "submit" in request.POST
+            newSub = Submission(
+                user = user,
+                sub_time = timezone.now(),
+                question = q,
+                sub_answer = request.POST["answer" + str(q.id)],
+                final_sub = is_final
+            )
 
-        if validSubmission:
-            for q in quiz.question_set.all():
-                print("LSDKFJSLKJDF" + str(q.id))
-                username = request.POST['userSubmitting']
-                print("username is: " + username)
-                user = User.objects.filter(username = username)[0]
-                newSub = Submission(
-                    user = user,
-                    sub_time = timezone.now(),
-                    question = q,
-                    sub_answer = request.POST["answer" + str(q.id)],
-                )
+            newSub.save()
 
-                newSub.save()
-
+        if "save" in request.POST:
+            context = {
+                'curr_quiz': quiz,
+                'subs_left': subs_left,
+                'user': request.user,
+                'validSubmission': False,
+            }
+            return HttpResponseRedirect(reverse('quiz:quiz_details', args = (quiz_id,)))
+        else:
             return HttpResponseRedirect(reverse('quiz:results', args=(quiz_id,)))
     else:
         context = {
@@ -174,7 +173,7 @@ def results(request, quiz_id):
 
     # Gets most recent submissions by this user for that quiz
     # Should be correct because for a quiz with n questions, there are n submissions in that order
-    quiz_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id)
+    quiz_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
     recent_subs = quiz_subs.order_by('sub_time')[len(quiz_subs) - len(quiz_questions):len(quiz_subs)]
     score = 0
     for sub in recent_subs:

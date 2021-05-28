@@ -15,33 +15,58 @@
   </head>
 
   <body>
-    <div class = "container">
-      <h1>Quizzes</h1>
 
-      {% if loggedIn %}
-          <h3>Welcome, {{ user.first_name }} {{ user.last_name }}</h3>
+    {% if loggedIn %}
+      <div class = "container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="">Quizzes</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
 
-        <!-- If logged in, then give them option to log out -->
-        <form method = "POST">
-          {% csrf_token %}
-          <input type = "hidden" name = "logout" value = "logout"> </input>
-          <button type="submit" class="btn btn-danger">Logout</button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="">Home <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="signup">Results</a>
+              </li>
+            </ul>
 
-        </form>
+            <ul class="navbar-nav ml-auto">
+              <span class="navbar-text mx-2">
+                {{ user.username }}
+              </span>
 
-        <br />
-        <p>Welcome to the quiz index! Choose the quiz you want to take.</p>
+              <form method = "POST" class="form-inline my-2 my-lg-0">
+                {% csrf_token %}
+                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" name = "logout">Logout</button>
+              </form>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <div class = "container">
+        <div class = "page-header my-4">
+          <h3>Welcome to the quiz index!</h3>
+        </div>
+        <p>Choose the quiz you want to take or choose results at the top to see your past results.</p>
 
         <ul class = "list-group">
           {% for quiz in quizzes %}
             <li class = "list-group-item"><a href = {{quiz.id}}>{{quiz.name}}</a></li>
           {% endfor %}
         </ul>
+      </div>
 
-      {% else %}
-
-        <!-- If not logged in, then give them option to log in -->
-
+    {% else %}
+      <div class = "container">
+        <div class = "page-header my-4">
+          <h3>Welcome to the quiz index!</h3>
+        </div>
+        <p>Please login to see quizzes and your past results.</p>
         <form method = "POST">
           {% csrf_token %}
           {% if failed %}
@@ -59,20 +84,13 @@
             <input type = "password" class = "form-control" name = "inputPassword" id = "inputPassword" />
           </div>
 
-          <button type = "submit" class = "btn btn-danger">Login</button>
+          <button type = "submit" class = "btn btn-success" name = "login">Login</button>
 
-          <br />
-          <p>Please login to see the possible quizzes.</p>
+          <button type = "submit" class = "btn btn-success" name = "signup">Sign Up</button>
+
         </form>
+      </div>
 
-        <form method = "POST">
-          {% csrf_token %}
-          <input type = "hidden" name = "signup" value = "signup"> </input>
-
-          <button type = "submit" class = "btn btn-danger">Sign Up</button>
-        </form>
-      {% endif %}
-
-    </div>
+    {% endif %}
   </body>
 </html>
