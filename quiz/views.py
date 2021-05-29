@@ -142,7 +142,7 @@ def quiz_details(request, quiz_id):
             }
             return HttpResponseRedirect(reverse('quiz:quiz_details', args = (quiz_id,)))
         else:
-            return HttpResponseRedirect(reverse('quiz:results', args=(quiz_id,)))
+            return HttpResponseRedirect(reverse('quiz:result_details', args=(quiz_id,)))
     else:
         context = {
             'curr_quiz': quiz,
@@ -161,10 +161,16 @@ def quiz_details(request, quiz_id):
     }
     return render(request, 'quiz/questions.html', context)
 
-def results_index(request):
-    return HttpResponse("results index...")
+def results(request):
+    context = {
+        'loggedIn': True
+    }
+    template = loader.get_template('quiz/results.html')
 
-def results(request, quiz_id):
+    
+    return HttpResponse(template.render(context, request))
+
+def result_details(request, quiz_id):
     if request.method == "POST":
         return HttpResponseRedirect(reverse('quiz:index'))
 
@@ -185,7 +191,7 @@ def results(request, quiz_id):
         'score': score,
     }
 
-    template = loader.get_template('quiz/results.html')
+    template = loader.get_template('quiz/result_details.html')
     return HttpResponse(template.render(context, request))
 
 def solutions(request, quiz_id):

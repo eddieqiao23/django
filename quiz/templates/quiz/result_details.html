@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Results</title>
+      <!-- This section (4 items) includes Bootstrap 4 -->
+
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+      <!-- jQuery library -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      <!-- Popper JS -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+      <!-- Latest compiled JavaScript -->
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+      <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$']]
+          }
+        };
+      </script>
+      <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+      </script>
+  </head>
+
+  <body>
+    <div class = "container">
+      <h1>{{curr_quiz.name}} Results</h1>
+
+      {% for sub in recent_subs %}
+        Question {{forloop.counter}}: {{sub.question.question_statement}} <br /> <br />
+        You submitted {{sub.sub_answer}}.
+        The right answer was {{sub.question.answer}}.
+        {%if sub.is_correct %}
+          CORRECT
+        {% else %}
+          WRONG
+        {% endif %}
+        <br /> <br />
+      {% endfor %}
+      Score: {{score}}/{{recent_subs|length}}
+
+      <br /> <br />
+
+      <form method = "POST">
+        {% csrf_token %}
+        <button type = "submit" class = "btn btn-primary">Return to Home</button>
+      </form>
+    </div>
+  </body>
+</html>
