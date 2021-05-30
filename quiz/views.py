@@ -119,15 +119,30 @@ class QuizDetailsView(View):
         past_final_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
         subs_left = quiz.max_subs - past_final_subs.count() // quiz.quiz_length
 
+        need_prefill = False
+        questions = Question.objects.filter(quiz = quiz)
+
+        if Submission.objects.filter(question = questions[0], user = request.user).count() == 0:
+            need_prefill = False
+        elif not((questions[0].last_sub).final_sub):
+            need_prefill = True
+
+        print(questions)
+
         context = {
             'curr_quiz': quiz,
             'subs_left': subs_left,
             'user': request.user,
             'validSubmission': False,
+            'need_prefill': need_prefill,
         }
         return render(request, 'quiz/questions.html', context)
 
     def post(self, request, quiz_id):
+        if 'logout' in request.POST:
+            logout(request)
+            return HttpResponseRedirect(reverse('quiz:index'))
+
         quiz = get_object_or_404(Quiz, pk = quiz_id)
 
         past_final_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
@@ -136,12 +151,12 @@ class QuizDetailsView(View):
         for q in quiz.question_set.all():
             username = request.POST['userSubmitting']
             user = User.objects.filter(username = username)[0]
-            is_final = "submit" in request.POST
+            is_final = 'submit' in request.POST
             newSub = Submission(
                 user = user,
                 sub_time = timezone.now(),
                 question = q,
-                sub_answer = request.POST["answer" + str(q.id)],
+                sub_answer = request.POST['answer' + str(q.id)],
                 final_sub = is_final
             )
 
@@ -160,14 +175,20 @@ class QuizDetailsView(View):
 
 class ResultsView(View):
     def get(self, request):
-        context = {
-            'loggedIn': True
-        }
         template = loader.get_template('quiz/results.html')
+        quizzes = []
+
+        for quiz in Quiz.objects.all():
+            past_subs = Submission.objects.filter(user=request.user, question__quiz=quiz, final_sub=True)
+            if past_subs.count() != 0:
+                quizzes.append(quiz)
+
+        context = {
+            'loggedIn': True,
+            'quizzes': quizzes,
+        }
 
         return HttpResponse(template.render(context, request))
-    def post(self, request):
-        return HttpResponse("HIIIIIII")
 
 class ResultDetailsView(View):
     def get(self, request, quiz_id):

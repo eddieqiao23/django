@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,6 +14,8 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
       <!-- Latest compiled JavaScript -->
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+      <link rel="stylesheet" type="text/css" href="{% static 'quiz/style.css' %}">
   </head>
 
   <body>
@@ -25,11 +29,11 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
+            <li class="nav-item">
               <a class="nav-link" href="/quiz">Home</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="">Results <span class="sr-only">(current)</span></a>
+            <li class="nav-item active">
+              <a class="nav-link" href="">Results</a>
             </li>
           </ul>
 

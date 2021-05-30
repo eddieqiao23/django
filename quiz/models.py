@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Quiz(models.Model):
     name = models.CharField(max_length=1000)
@@ -11,14 +12,14 @@ class Quiz(models.Model):
 
     def __str__(self):
         return self.name
-    # change this later to date allowed to see, question numbers, and allowed date
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete = models.CASCADE, default = 0)
-    question_statement = models.CharField(max_length = 250)
-    answer = models.CharField(default = "", max_length = 250) # Maybe change to string?
+    question_statement = models.CharField(max_length = 500)
+    answer = models.CharField(default = "", max_length = 250)
     solution = models.CharField(max_length=1000, default = "solution !")
 
+    @property
     def last_sub(self):
         return Submission.objects.filter(question = self).order_by("-sub_time")[0]
 
