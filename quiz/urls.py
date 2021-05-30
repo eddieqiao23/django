@@ -5,12 +5,9 @@ from django.urls import include, path
 
 app_name = "quiz"
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('signup/', views.signup, name = 'signup'),
-    # ex: /quiz/5/
-    path('<int:quiz_id>/', views.quiz_details, name = 'quiz_details'),
-    # ex: /quiz/3/results/
-    path('results/', views.results, name = 'results'),
-    path('<int:quiz_id>/results', views.result_details, name = 'result_details'),
-    path('<int:quiz_id>/solutions/', views.solutions, name='solutions'),
+    path('', views.IndexView.as_view(), name = 'index'),
+    path('signup/', views.SignupView.as_view(), name = 'signup'),
+    path('<int:quiz_id>/', views.QuizDetailsView.as_view(), name = 'quiz_details'),
+    path('results/', views.ResultsView.as_view(), name = 'results'),
+    path('<int:quiz_id>/results', views.ResultDetailsView.as_view(), name = 'result_details'),
 ]
