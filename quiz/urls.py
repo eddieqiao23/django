@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:quiz_id>/', views.QuizDetailsView.as_view(), name = 'quiz_details'),
     path('results/', views.ResultsView.as_view(), name = 'results'),
     path('results/<int:quiz_id>/', views.ResultDetailsView.as_view(), name = 'result_details'),
+    path('test/', views.TestPageView.as_view(), name = 'test'),
 ]

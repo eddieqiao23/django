@@ -120,21 +120,31 @@ class QuizDetailsView(View):
         subs_left = quiz.max_subs - past_final_subs.count() // quiz.quiz_length
 
         need_prefill = False
+        prefill_vals = []
+        data = []
         questions = Question.objects.filter(quiz = quiz)
 
-        if Submission.objects.filter(question = questions[0], user = request.user).count() == 0:
-            need_prefill = False
-        elif not((questions[0].last_sub).final_sub):
-            need_prefill = True
+        for q in questions:
+            curr_data = [q.question_statement, q.id]
+            if Submission.objects.filter(question = questions[0], user = request.user).count() == 0:
+                curr_data.append("")
+            else:
+                last_sub = Submission.objects.filter(question = q, user = request.user).order_by("-sub_time")[0]
+                if last_sub.final_sub:
+                    curr_data.append("")
+                else:
+                    curr_data.append(last_sub.sub_answer)
 
-        print(questions)
+            data.append(curr_data)
+
+        print(data)
 
         context = {
             'curr_quiz': quiz,
             'subs_left': subs_left,
             'user': request.user,
             'validSubmission': False,
-            'need_prefill': need_prefill,
+            'data': data,
         }
         return render(request, 'quiz/questions.html', context)
 
@@ -218,3 +228,11 @@ class ResultDetailsView(View):
 
     def post(self, request, quiz_id):
         return HttpResponseRedirect(reverse('quiz:results'))
+
+class TestPageView(View):
+    def get(self, request):
+        template = loader.get_template('quiz/test.html')
+        context = {
+            'array': [1, 2, 3],
+        }
+        return HttpResponse(template.render(context, request))
