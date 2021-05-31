@@ -30,8 +30,90 @@
   </head>
 
   <body>
+    <div class = "container-fluid">
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="">Quizzes</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/quiz">Home</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="/quiz/results">Results</a>
+            </li>
+          </ul>
+
+          <ul class="navbar-nav ml-auto">
+            <span class="navbar-text mx-2">
+              {{ user.username }}
+            </span>
+
+            <form method = "POST" class="form-inline my-2 my-lg-0">
+              {% csrf_token %}
+              <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" name = "logout">Logout</button>
+            </form>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
     <div class = "container">
-      <h1>{{curr_quiz.name}} Results</h1>
+      <h1 class = "my-3">Results</h1>
+
+      <div class = "row">
+        <div class = "col-sm-1">
+          Problem
+        </div>
+        <div class = "col-sm-8 mb-4">
+          Problem Statement
+        </div>
+        <div class = "col-sm-1">
+          Submitted
+        </div>
+        <div class = "col-sm-1">
+          Correct
+        </div>
+        <div class = "col-sm-1">
+          Result
+        </div>
+
+        {% for sub in recent_subs %}
+          <div class = "col-sm-1">
+            {{ forloop.counter }}
+          </div>
+          <div class = "col-sm-8 mb-4">
+            <span class="math display">{{ sub.question.question_statement }}</span>
+          </div>
+          <div class = "col-sm-1">
+            {{ sub.sub_answer }}
+          </div>
+          <div class = "col-sm-1">
+            {{ sub.question.answer }}
+          </div>
+          {% if sub.is_correct %}
+            <div class = "col-sm-1">
+              &#10004;
+            </div>
+          {% else %}
+            <div class = "col-sm-1">
+              &#10060;
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <form method = "POST">
+        {% csrf_token %}
+        <button type = "submit" class = "btn btn-primary">Return to Results Index</button>
+      </form>
+
+
+
+      <!-- <h1>{{curr_quiz.name}} Results</h1>
 
       {% for sub in recent_subs %}
         Question {{forloop.counter}}: {{sub.question.question_statement}} <br /> <br />
@@ -51,7 +133,7 @@
       <form method = "POST">
         {% csrf_token %}
         <button type = "submit" class = "btn btn-primary">Return to Home</button>
-      </form>
+      </form> -->
     </div>
   </body>
 </html>

@@ -190,6 +190,10 @@ class ResultsView(View):
 
         return HttpResponse(template.render(context, request))
 
+    def post(self, request):
+        logout(request)
+        return HttpResponseRedirect(reverse('quiz:index'))
+
 class ResultDetailsView(View):
     def get(self, request, quiz_id):
         curr_quiz = Quiz.objects.filter(id=quiz_id)[0]
@@ -213,4 +217,4 @@ class ResultDetailsView(View):
         return HttpResponse(template.render(context, request))
 
     def post(self, request, quiz_id):
-        return HttpResponseRedirect(reverse('quiz:index'))
+        return HttpResponseRedirect(reverse('quiz:results'))

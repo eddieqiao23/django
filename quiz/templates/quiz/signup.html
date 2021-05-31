@@ -19,10 +19,85 @@
   </head>
 
   <body>
+    <div class = "container-fluid">
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/quiz">Quizzes</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/quiz">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="results">Results</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
     <div class = "container">
-      <h1>Signup</h1>
+      <h2 class = "my-3">Create an Account</h2>
+
+      {% if failed %}
+        <div class = "alert alert-danger">
+          There is an error with your account.
+        </div>
+      {% endif %}
 
       <form method = "POST">
+        {% csrf_token %}
+        <div class = "row">
+          <div class = "col-sm-2 my-3 text-right">
+            Username*
+          </div>
+          <div class = "col-sm-10 my-3">
+            <input type = "text" class = "form-control" name = "inputUsername" id = "inputUsername" placeholder = "Choose a username" />
+          </div>
+
+          {% if noUsername %}
+            <div class = "col-sm-3 alert alert-danger">
+              Please enter a username.
+            </div>
+            <div class = "col-sm-9"> </div>
+          {% elif duplicateUser %}
+            <div class = "col-sm-3 alert alert-danger">
+              This username is already used.
+            </div>
+            <div class = "col-sm-9"> </div>
+          {% endif %}
+
+          <div class = "col-sm-2 my-3 text-right">
+            Password*
+          </div>
+          <div class = "col-sm-10 my-3">
+            <input type = "password" class = "form-control" name = "inputPassword" id = "inputPassword" placeholder = "Choose a password" />
+          </div>
+
+          <div class = "col-sm-2 my-3 text-right">
+            Confirm Password*
+          </div>
+          <div class = "col-sm-10 my-3">
+            <input type = "password" class = "form-control" name = "inputPasswordConfirm" id = "inputPasswordConfirm" placeholder = "Retype your password" />
+          </div>
+
+          {% if diffPassword %}
+            <div class = "col-sm-3 alert alert-danger">
+              The passwords do not match.
+            </div>
+            <div class = "col-sm-9"> </div>
+          {% endif %}
+
+          <div class = "col-sm-12 text-center my-4">
+            <button type = "submit" class = "btn btn-success">Signup</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- <form method = "POST">
         {% csrf_token %}
         {% if failed %}
           <div class = "alert alert-danger">
@@ -60,7 +135,7 @@
         {% endif %}
 
         <button type = "submit" class = "btn btn-success">Signup</button>
-      </form>
+      </form> -->
     </div>
   </body>
 </html>
