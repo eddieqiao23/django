@@ -57,57 +57,47 @@
       </nav>
     </div>
 
-    <div class="jumbotron jumbotron-fluid" style="background-color:#e9ecef;">
-      <div class="container">
-        <h1 class="display-4">{{curr_quiz.name}}</h1>
-        <p class="lead">Submissions left: {{ subs_left }}</p>
+    {% if quiz_exists %}
+      <div class="jumbotron jumbotron-fluid" style="background-color:#e9ecef;">
+        <div class="container">
+          <h1 class="display-4">{{curr_quiz.name}}</h1>
+          <p class="lead">Submissions left: {{ subs_left }}</p>
+        </div>
       </div>
-    </div>
 
-    <div class = "container">
-      {% if subs_left > 0 %}
-        <div id = "questions"> </div>
+      <div class = "container">
+        {% if subs_left > 0 %}
+          <div id = "questions"> </div>
 
-        <form method = "POST">
-          {% csrf_token %}
+          <form method = "POST">
+            {% csrf_token %}
 
-
-
-          <div class = "row">
-            {% for curr_data in data %}
-              <div class = "col-sm-1">
-                {{ forloop.counter }}
-              </div>
-              <div class = "col-sm-9 mb-4">
-                <span class="math display">{{ curr_data.0 }}</span>
-              </div>
-              <div class = "col-sm-2">
-                <input type = "text" name = "answer{{ curr_data.1 }}" class = "form-control" value = "{{ curr_data.2 }}">
-              </div>
-            {% endfor %}
-          </div>
-
-          <!-- {% for question in curr_quiz.question_set.all %}
-            <div class = "form-group">
-              <label for = "question">
-                Question {{ forloop.counter }}: <span class="math display">{{question.question_statement}}</span>
-              </label>
-
-              {% if need_prefill %}
-                <input type = "text" name = "answer{{question.id}}" class = "form-control" value = "{{question.last_sub.sub_answer}}">
-              {% else %}
-                <input type = "text" name = "answer{{question.id}}" class = "form-control">
-              {% endif %}
+            <div class = "row">
+              {% for curr_data in data %}
+                <div class = "col-sm-1">
+                  {{ forloop.counter }}
+                </div>
+                <div class = "col-sm-9 mb-4">
+                  <span class="math display">{{ curr_data.0 }}</span>
+                </div>
+                <div class = "col-sm-2">
+                  <input type = "text" name = "answer{{ curr_data.1 }}" class = "form-control" value = "{{ curr_data.2 }}">
+                </div>
+              {% endfor %}
             </div>
-          {% endfor %} -->
 
-          <input type = "hidden" name = "userSubmitting" value = "{{ user.username }}" />
-          <button type = "submit" class = "btn btn-secondary" name = "save">Save</button>
-          <button type = "submit" class = "btn btn-success" name = "submit">Submit</button>
-        </form>
-      {% else %}
-        You are not allowed to submit to this quiz.
-      {% endif %}
-    </div>
+            <input type = "hidden" name = "userSubmitting" value = "{{ user.username }}" />
+            <button type = "submit" class = "btn btn-secondary" name = "save">Save</button>
+            <button type = "submit" class = "btn btn-success" name = "submit">Submit</button>
+          </form>
+        {% else %}
+          You are not allowed to submit to this quiz.
+        {% endif %}
+      </div>
+    {% else %}
+      <div class = "container">
+        <p class = "mt-3">The quiz does not exist.</p>
+      </div>
+    {% endif %}
   </body>
 </html>

@@ -62,54 +62,59 @@
     </div>
 
     <div class = "container">
-      <h1 class = "my-3">Results</h1>
+      {% if quiz_exists %}
+        <h1 class = "my-3">Results</h1>
 
-      <div class = "row">
-        <div class = "col-sm-1">
-          Problem
-        </div>
-        <div class = "col-sm-8 mb-4">
-          Problem Statement
-        </div>
-        <div class = "col-sm-1">
-          Submitted
-        </div>
-        <div class = "col-sm-1">
-          Correct
-        </div>
-        <div class = "col-sm-1">
-          Result
-        </div>
-
-        {% for sub in recent_subs %}
+        <div class = "row">
           <div class = "col-sm-1">
-            {{ forloop.counter }}
+            Problem
           </div>
           <div class = "col-sm-8 mb-4">
-            <span class="math display">{{ sub.question.question_statement }}</span>
+            Problem Statement
           </div>
           <div class = "col-sm-1">
-            {{ sub.sub_answer }}
+            Submitted
           </div>
           <div class = "col-sm-1">
-            {{ sub.question.answer }}
+            Correct
           </div>
-          {% if sub.is_correct %}
+          <div class = "col-sm-1">
+            Result
+          </div>
+
+          {% for sub in recent_subs %}
             <div class = "col-sm-1">
-              &#10004;
+              {{ forloop.counter }}
             </div>
-          {% else %}
+            <div class = "col-sm-8 mb-4">
+              <span class="math display">{{ sub.question.question_statement }}</span>
+            </div>
             <div class = "col-sm-1">
-              &#10060;
+              {{ sub.sub_answer }}
             </div>
-          {% endif %}
-        {% endfor %}
+            <div class = "col-sm-1">
+              {{ sub.question.answer }}
+            </div>
+            {% if sub.is_correct %}
+              <div class = "col-sm-1">
+                &#10004;
+              </div>
+            {% else %}
+              <div class = "col-sm-1">
+                &#10060;
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <p class = "mt-3">This quiz does not exist.</p>
+        {% endif %}
+
+        <form method = "POST">
+          {% csrf_token %}
+          <button type = "submit" class = "btn btn-primary">Return to Results Index</button>
+        </form>
       </div>
 
-      <form method = "POST">
-        {% csrf_token %}
-        <button type = "submit" class = "btn btn-primary">Return to Results Index</button>
-      </form>
 
 
 

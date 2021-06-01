@@ -101,52 +101,63 @@ class SignupView(View):
 
             login_user = authenticate(username=request.POST['inputUsername'], password=request.POST['inputPassword'])
 
-
             if login_user is not None:
                 login(request, login_user)
             else:
-                print("SLKDFJLKSDFLKJSDJKF")
+                return HttpResponse("If you reach this page I failed :(")
 
             return HttpResponseRedirect(reverse('quiz:index'))
+        else:
+            context = {
+                'diffPassword': diffPassword,
+                'duplicateUser': duplicateUser,
+                'noUsername': noUsername,
+                'noPassword': noPassword,
+                'prefill_vals': [request.POST["inputUsername"], request.POST["inputPassword"], request.POST["inputPasswordConfirm"]],
+            }
 
 
         return HttpResponse(template.render(context, request))
 
 class QuizDetailsView(View):
     def get(self, request, quiz_id):
-        quiz = get_object_or_404(Quiz, pk = quiz_id)
+        if Quiz.objects.filter(id = quiz_id).count() == 0:
+            context = {
+                'quiz_exists': False
+            }
+        else:
+            quiz = Quiz.objects.get(id = quiz_id)
 
-        past_final_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
-        subs_left = quiz.max_subs - past_final_subs.count() // quiz.quiz_length
+            past_final_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
+            subs_left = quiz.max_subs - past_final_subs.count() // quiz.quiz_length
 
-        need_prefill = False
-        prefill_vals = []
-        data = []
-        questions = Question.objects.filter(quiz = quiz)
+            need_prefill = False
+            prefill_vals = []
+            data = []
+            questions = Question.objects.filter(quiz = quiz)
 
-        for q in questions:
-            curr_data = [q.question_statement, q.id]
-            if Submission.objects.filter(question = questions[0], user = request.user).count() == 0:
-                curr_data.append("")
-            else:
-                last_sub = Submission.objects.filter(question = q, user = request.user).order_by("-sub_time")[0]
-                if last_sub.final_sub:
+            for q in questions:
+                curr_data = [q.question_statement, q.id]
+                if Submission.objects.filter(question = q, user = request.user).count() == 0:
                     curr_data.append("")
                 else:
-                    curr_data.append(last_sub.sub_answer)
+                    last_sub = Submission.objects.filter(question = q, user = request.user).order_by("-sub_time")[0]
+                    if last_sub.final_sub:
+                        curr_data.append("")
+                    else:
+                        curr_data.append(last_sub.sub_answer)
 
-            data.append(curr_data)
+                data.append(curr_data)
 
-        print(data)
-
-        context = {
-            'curr_quiz': quiz,
-            'subs_left': subs_left,
-            'user': request.user,
-            'validSubmission': False,
-            'data': data,
-        }
-        return render(request, 'quiz/questions.html', context)
+            context = {
+                'curr_quiz': quiz,
+                'subs_left': subs_left,
+                'user': request.user,
+                'validSubmission': False,
+                'data': data,
+                'quiz_exists': True,
+            }
+        return render(request, 'quiz/quiz_details.html', context)
 
     def post(self, request, quiz_id):
         if 'logout' in request.POST:
@@ -206,22 +217,31 @@ class ResultsView(View):
 
 class ResultDetailsView(View):
     def get(self, request, quiz_id):
-        curr_quiz = Quiz.objects.filter(id=quiz_id)[0]
-        quiz_questions = curr_quiz.question_set.all()
+        quiz_exists = True
+        if Quiz.objects.filter(id = quiz_id).count() == 0:
+            context = {
+                'quiz_exists': False
+            }
+        else:
+            curr_quiz = Quiz.objects.filter(id=quiz_id)[0]
+            quiz_questions = curr_quiz.question_set.all()
 
-        # Gets most recent submissions by this user for that quiz
-        # Should be correct because for a quiz with n questions, there are n submissions in that order
-        quiz_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
-        recent_subs = quiz_subs.order_by('sub_time')[len(quiz_subs) - len(quiz_questions):len(quiz_subs)]
-        score = 0
-        for sub in recent_subs:
-            if sub.is_correct:
-                score += 1
+            # Gets most recent submissions by this user for that quiz
+            # Should be correct because for a quiz with n questions, there are n submissions in that order
+            quiz_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
+            print(quiz_subs)
+            print(len(quiz_questions))
+            recent_subs = quiz_subs.order_by('sub_time')[len(quiz_subs) - len(quiz_questions):len(quiz_subs)]
+            score = 0
+            for sub in recent_subs:
+                if sub.is_correct:
+                    score += 1
 
-        context = {
-            'recent_subs': recent_subs,
-            'score': score,
-        }
+            context = {
+                'recent_subs': recent_subs,
+                'score': score,
+                'quiz_exists': True
+            }
 
         template = loader.get_template('quiz/result_details.html')
         return HttpResponse(template.render(context, request))
