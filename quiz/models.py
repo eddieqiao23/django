@@ -4,6 +4,7 @@ from django.utils import timezone
 
 class Quiz(models.Model):
     name = models.CharField(max_length=1000)
+    description = models.CharField(max_length=300, default = "")
     max_subs = models.IntegerField(default = 99999)
 
     @property
@@ -15,9 +16,8 @@ class Quiz(models.Model):
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete = models.CASCADE, default = 0)
-    question_statement = models.CharField(max_length = 500)
-    answer = models.CharField(default = "", max_length = 250)
-    solution = models.CharField(max_length=1000, default = "solution !")
+    question_statement = models.CharField(max_length = 750)
+    answer = models.CharField(default = "", max_length = 30)
 
     @property
     def last_sub(self):
