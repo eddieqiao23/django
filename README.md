@@ -7,5 +7,6 @@ Additional features (there may be others):
 * Uses the user's age to filter out certain quizzes 
 
 When using the website, one can access the admin page with the following account.
-Username: admin
+
+Username: admin <br />
 Password: bah
