@@ -91,51 +91,25 @@
             <div class = "col-sm-9"> </div>
           {% endif %}
 
+          <div class = "col-sm-2 my-3 text-right">
+            Age*
+          </div>
+          <div class = "col-sm-10 my-3">
+            <input type = "number" class = "form-control" name = "inputAge" id = "inputAge" placeholder = "Enter your age (very important when taking math tests)" value = "{{ prefill_vals.3 }}" />
+          </div>
+
+          {% if noAge %}
+            <div class = "col-sm-3 alert alert-danger">
+              Please enter an age.
+            </div>
+            <div class = "col-sm-9"> </div>
+          {% endif %}
+
           <div class = "col-sm-12 text-center my-4">
             <button type = "submit" class = "btn btn-success">Signup</button>
           </div>
         </div>
       </form>
-
-      <!-- <form method = "POST">
-        {% csrf_token %}
-        {% if failed %}
-          <div class = "alert alert-danger">
-            There is an error with your account.
-          </div>
-        {% endif %}
-        <div class = "form-group">
-          <label for = "inputUsername">Username</label>
-          <input type = "text" class = "form-control" name = "inputUsername" id = "inputUsername" />
-        </div>
-        {% if noUsername %}
-          <div class = "alert alert-danger">
-            Please enter a username.
-          </div>
-        {% elif duplicateUser %}
-          <div class = "alert alert-danger">
-            This username is already used.
-          </div>
-        {% endif %}
-
-        <div class = "form-group">
-          <label for = "inputPassword">Password</label>
-          <input type = "password" class = "form-control" name = "inputPassword" id = "inputPassword" />
-        </div>
-
-        <div class = "form-group">
-          <label for = "inputPasswordConfirm">Confirm Password</label>
-          <input type = "password" class = "form-control" name = "inputPasswordConfirm" id = "inputPasswordConfirm" />
-        </div>
-
-        {% if diffPassword %}
-          <div class = "alert alert-danger">
-            The passwords do not match.
-          </div>
-        {% endif %}
-
-        <button type = "submit" class = "btn btn-success">Signup</button>
-      </form> -->
     </div>
   </body>
 </html>

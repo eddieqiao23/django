@@ -4,7 +4,7 @@ from django.template import loader
 from django.urls import reverse
 from django.views import View
 
-from .models import Question, Quiz, Submission
+from .models import Question, Quiz, Submission, UserAge
 
 from django.utils import timezone
 
@@ -43,7 +43,8 @@ class IndexView(View):
         elif 'logout' in request.POST.keys():
             logout(request)
         else:
-            user = authenticate(username=request.POST['inputUsername'], password=request.POST['inputPassword'])
+            user = authenticate(username=request.POST['inputUsername'], \
+            password=request.POST['inputPassword'])
             if user is not None:
                 login(request, user)
                 loggedIn = True
@@ -69,7 +70,8 @@ class SignupView(View):
             'diffPassword': False,
             'duplicateUser': False,
             'noUsername': False,
-            'noPassword': False
+            'noPassword': False,
+            'noAge': False,
         }
 
         return HttpResponse(template.render(context, request))
@@ -81,6 +83,7 @@ class SignupView(View):
         duplicateUser = False
         noUsername = False
         noPassword = False
+        noAge = False
 
         if request.POST["inputPassword"] != request.POST["inputPasswordConfirm"]:
             diffPassword = True
@@ -90,15 +93,19 @@ class SignupView(View):
             noUsername = True
         if len(request.POST["inputPassword"]) == 0 and len(request.POST["inputPasswordConfirm"]) == 0:
             noPassword = True
+        if len(request.POST["inputAge"]) == 0:
+            noAge = True
 
         context = {
             'diffPassword': diffPassword,
             'duplicateUser': duplicateUser,
             'noUsername': noUsername,
-            'noPassword': noPassword
+            'noPassword': noPassword,
+            'noAge': noAge,
         }
 
-        if (not diffPassword) and (not duplicateUser) and (not noUsername) and (not noPassword):
+        if (not diffPassword) and (not duplicateUser) \
+        and (not noUsername) and (not noPassword) and (not noAge):
             # If everything works out, try creating the user
             user = User.objects.create_user(
                 username = request.POST["inputUsername"],
@@ -106,8 +113,12 @@ class SignupView(View):
             )
             user.save()
 
+            userAge = UserAge(user = user, age = request.POST["inputAge"])
+            userAge.save()
+
             # Tries to log the user in
-            login_user = authenticate(username=request.POST['inputUsername'], password=request.POST['inputPassword'])
+            login_user = authenticate(username=request.POST['inputUsername'],
+            password=request.POST['inputPassword'])
             if login_user is not None:
                 login(request, login_user)
             else:
@@ -121,9 +132,12 @@ class SignupView(View):
                 'duplicateUser': duplicateUser,
                 'noUsername': noUsername,
                 'noPassword': noPassword,
-                'prefill_vals': [request.POST["inputUsername"], request.POST["inputPassword"], request.POST["inputPasswordConfirm"]],
+                'noAge': noAge,
+                'prefill_vals': [request.POST["inputUsername"],
+                request.POST["inputPassword"],
+                request.POST["inputPasswordConfirm"],
+                request.POST["inputAge"]],
             }
-
 
         return HttpResponse(template.render(context, request))
 
@@ -141,8 +155,13 @@ class QuizDetailsView(View):
             # Gets the quiz (doesn't need error message since we know it exists)
             quiz = Quiz.objects.get(id = quiz_id)
 
+            allowed_view = True
+            if quiz.is_18_plus and request.user.userage.under_18:
+                allowed_view = False
+
             # Determines submissions already used
-            past_final_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
+            past_final_subs = Submission.objects.filter(user = request.user, \
+            question__quiz__id = quiz_id, final_sub = True)
             subs_left = quiz.max_subs - past_final_subs.count() // quiz.quiz_length
 
             # If the user saved answers before but didn't submit, then prefill
@@ -158,7 +177,8 @@ class QuizDetailsView(View):
                 if Submission.objects.filter(question = q, user = request.user).count() == 0:
                     curr_data.append("")
                 else:
-                    last_sub = Submission.objects.filter(question = q, user = request.user).order_by("-sub_time")[0]
+                    last_sub = Submission.objects.filter(question = q, \
+                    user = request.user).order_by("-sub_time")[0]
                     # If the last submission was "submit," thenno prefill
                     if last_sub.final_sub:
                         curr_data.append("")
@@ -175,6 +195,7 @@ class QuizDetailsView(View):
                 'validSubmission': False,
                 'data': data,
                 'quiz_exists': True,
+                'allowed_view': allowed_view
             }
         return render(request, 'quiz/quiz_details.html', context)
 
@@ -186,7 +207,8 @@ class QuizDetailsView(View):
 
         # Determines how many submissions the user has left
         quiz = get_object_or_404(Quiz, pk = quiz_id)
-        past_final_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
+        past_final_subs = Submission.objects.filter(user = request.user, \
+        question__quiz__id = quiz_id, final_sub = True)
         subs_left = quiz.max_subs - past_final_subs.count() // quiz.quiz_length
 
         for q in quiz.question_set.all():
@@ -226,7 +248,8 @@ class ResultsView(View):
 
         # Gets the quizzes that the user has submitted answers for
         for quiz in Quiz.objects.all():
-            past_subs = Submission.objects.filter(user=request.user, question__quiz=quiz, final_sub=True)
+            past_subs = Submission.objects.filter(user = request.user, \
+            question__quiz = quiz, final_sub = True)
             if past_subs.count() != 0:
                 quizzes.append(quiz)
 
@@ -258,8 +281,10 @@ class ResultDetailsView(View):
 
             # Gets most recent submissions by this user for that quiz
             # Should be correct because for a quiz with n questions, there are n submissions in that order
-            quiz_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
-            recent_subs = quiz_subs.order_by('sub_time')[len(quiz_subs) - len(quiz_questions):len(quiz_subs)]
+            quiz_subs = Submission.objects.filter(user = request.user, \
+            question__quiz__id = quiz_id, final_sub = True)
+            recent_subs = quiz_subs.order_by('sub_time')[len(quiz_subs) - \
+            len(quiz_questions):len(quiz_subs)]
 
             # Calculates score
             score = 0

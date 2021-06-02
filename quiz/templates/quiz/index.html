@@ -99,7 +99,23 @@
               Login information was incorrect.
             </div>
           {% endif %}
-          <div class = "form-group">
+
+          <div class = "row">
+            <div class = "col-sm-1 my-2">
+              Username
+            </div>
+            <div class = "col-sm-11 my-2">
+              <input type = "text" class = "form-control" name = "inputUsername" id = "inputUsername" />
+            </div>
+
+            <div class = "col-sm-1 my-2">
+              Password
+            </div>
+            <div class = "col-sm-11 my-2">
+              <input type = "password" class = "form-control" name = "inputPassword" id = "inputPassword" />
+            </div>
+          </div>
+          <!-- <div class = "form-group">
             <label for = "inputUsername">Username</label>
             <input type = "text" class = "form-control" name = "inputUsername" id = "inputUsername" />
           </div>
@@ -107,11 +123,11 @@
           <div class = "form-group">
             <label for = "inputPassword">Password</label>
             <input type = "password" class = "form-control" name = "inputPassword" id = "inputPassword" />
-          </div>
+          </div> -->
 
-          <button type = "submit" class = "btn btn-success" name = "login">Login</button>
+          <button type = "submit" class = "btn btn-success my-2" name = "login">Login</button>
 
-          <button type = "submit" class = "btn btn-success" name = "signup">Sign Up</button>
+          <button type = "submit" class = "btn btn-success my-2" name = "signup">Sign Up</button>
 
         </form>
       </div>

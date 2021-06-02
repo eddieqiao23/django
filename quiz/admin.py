@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Question, Quiz, Submission
+from .models import Question, Quiz, Submission, UserAge
 
 class QuestionInline(admin.TabularInline):
     model = Question
@@ -11,3 +11,4 @@ class QuizAdmin(admin.ModelAdmin):
 
 admin.site.register(Quiz, QuizAdmin)
 admin.site.register(Submission)
+admin.site.register(UserAge)
