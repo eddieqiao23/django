@@ -40,7 +40,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="/quiz">&laquo; Back</a>
+              <a class="nav-link" href="/">&laquo; Back</a>
           </ul>
 
           <ul class="navbar-nav ml-auto">
@@ -81,6 +81,7 @@
                   <span class="math display">{{ curr_data.0 }}</span>
                 </div>
                 <div class = "col-sm-2">
+                  <!-- Creates an input form for each question and prefills it -->
                   <input type = "text" name = "answer{{ curr_data.1 }}" class = "form-control" value = "{{ curr_data.2 }}">
                 </div>
               {% endfor %}

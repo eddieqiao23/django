@@ -13,8 +13,10 @@ from django.contrib.auth import authenticate, login, logout
 
 class IndexView(View):
     def get(self, request):
+        # The get method just loads the index
         quizzes = Quiz.objects.all()
         template = loader.get_template('quiz/index.html')
+        # Creates different pages if logged in or not
         if request.user.is_authenticated:
             loggedIn = True
         else:
@@ -31,10 +33,11 @@ class IndexView(View):
 
     def post(self, request):
         quizzes = Quiz.objects.all()
-        failed = False
+        failed = False # Error message if wrong password or something
         template = loader.get_template('quiz/index.html')
         loggedIn = False
 
+        # Checks if signup, logout, or login was pressed
         if "signup" in request.POST.keys():
             return HttpResponseRedirect(reverse('quiz:signup'))
         elif 'logout' in request.POST.keys():
@@ -45,6 +48,7 @@ class IndexView(View):
                 login(request, user)
                 loggedIn = True
             else:
+                # Wrong password or something
                 failed = True
 
 
@@ -59,6 +63,7 @@ class IndexView(View):
 
 class SignupView(View):
     def get(self, request):
+        # Just loads the page
         template = loader.get_template('quiz/signup.html')
         context = {
             'diffPassword': False,
@@ -71,6 +76,7 @@ class SignupView(View):
 
     def post(self, request):
         template = loader.get_template('quiz/signup.html')
+        # Possible error messages when signing up
         diffPassword = False
         duplicateUser = False
         noUsername = False
@@ -93,14 +99,15 @@ class SignupView(View):
         }
 
         if (not diffPassword) and (not duplicateUser) and (not noUsername) and (not noPassword):
+            # If everything works out, try creating the user
             user = User.objects.create_user(
                 username = request.POST["inputUsername"],
                 password = request.POST["inputPassword"],
             )
             user.save()
 
+            # Tries to log the user in
             login_user = authenticate(username=request.POST['inputUsername'], password=request.POST['inputPassword'])
-
             if login_user is not None:
                 login(request, login_user)
             else:
@@ -108,6 +115,7 @@ class SignupView(View):
 
             return HttpResponseRedirect(reverse('quiz:index'))
         else:
+            # Sends the error messages and the values so that the form doesn't clear
             context = {
                 'diffPassword': diffPassword,
                 'duplicateUser': duplicateUser,
@@ -121,29 +129,40 @@ class SignupView(View):
 
 class QuizDetailsView(View):
     def get(self, request, quiz_id):
+        if not(request.user.is_authenticated):
+            return HttpResponseRedirect(reverse('quiz:index'))
+
+        # Makes sure the quiz actually exists
         if Quiz.objects.filter(id = quiz_id).count() == 0:
             context = {
                 'quiz_exists': False
             }
         else:
+            # Gets the quiz (doesn't need error message since we know it exists)
             quiz = Quiz.objects.get(id = quiz_id)
 
+            # Determines submissions already used
             past_final_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
             subs_left = quiz.max_subs - past_final_subs.count() // quiz.quiz_length
 
+            # If the user saved answers before but didn't submit, then prefill
             need_prefill = False
             prefill_vals = []
             data = []
             questions = Question.objects.filter(quiz = quiz)
 
+            # Data stores question statements and IDs, which makes it easier later
             for q in questions:
                 curr_data = [q.question_statement, q.id]
+                # If not submission before
                 if Submission.objects.filter(question = q, user = request.user).count() == 0:
                     curr_data.append("")
                 else:
                     last_sub = Submission.objects.filter(question = q, user = request.user).order_by("-sub_time")[0]
+                    # If the last submission was "submit," thenno prefill
                     if last_sub.final_sub:
                         curr_data.append("")
+                    # Otherwise, it was a saved answer
                     else:
                         curr_data.append(last_sub.sub_answer)
 
@@ -160,19 +179,23 @@ class QuizDetailsView(View):
         return render(request, 'quiz/quiz_details.html', context)
 
     def post(self, request, quiz_id):
+        # This could be logout, save, or submit
         if 'logout' in request.POST:
             logout(request)
             return HttpResponseRedirect(reverse('quiz:index'))
 
+        # Determines how many submissions the user has left
         quiz = get_object_or_404(Quiz, pk = quiz_id)
-
         past_final_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
         subs_left = quiz.max_subs - past_final_subs.count() // quiz.quiz_length
 
         for q in quiz.question_set.all():
             username = request.POST['userSubmitting']
             user = User.objects.filter(username = username)[0]
+            # "submit" = True, "save" = False
             is_final = 'submit' in request.POST
+
+            # Creates the new submission and saves it
             newSub = Submission(
                 user = user,
                 sub_time = timezone.now(),
@@ -180,7 +203,6 @@ class QuizDetailsView(View):
                 sub_answer = request.POST['answer' + str(q.id)],
                 final_sub = is_final
             )
-
             newSub.save()
 
         if "save" in request.POST:
@@ -196,27 +218,35 @@ class QuizDetailsView(View):
 
 class ResultsView(View):
     def get(self, request):
+        if not(request.user.is_authenticated):
+            return HttpResponseRedirect(reverse('quiz:index'))
+
         template = loader.get_template('quiz/results.html')
         quizzes = []
 
+        # Gets the quizzes that the user has submitted answers for
         for quiz in Quiz.objects.all():
             past_subs = Submission.objects.filter(user=request.user, question__quiz=quiz, final_sub=True)
             if past_subs.count() != 0:
                 quizzes.append(quiz)
 
         context = {
-            'loggedIn': True,
             'quizzes': quizzes,
         }
 
         return HttpResponse(template.render(context, request))
 
     def post(self, request):
+        # The only possibliity is that "logout" was clicked, so it logs the user out
         logout(request)
         return HttpResponseRedirect(reverse('quiz:index'))
 
 class ResultDetailsView(View):
     def get(self, request, quiz_id):
+        if not(request.user.is_authenticated):
+            return HttpResponseRedirect(reverse('quiz:index'))
+
+        # Checks if the quiz exists
         quiz_exists = True
         if Quiz.objects.filter(id = quiz_id).count() == 0:
             context = {
@@ -229,9 +259,9 @@ class ResultDetailsView(View):
             # Gets most recent submissions by this user for that quiz
             # Should be correct because for a quiz with n questions, there are n submissions in that order
             quiz_subs = Submission.objects.filter(user = request.user, question__quiz__id = quiz_id, final_sub = True)
-            print(quiz_subs)
-            print(len(quiz_questions))
             recent_subs = quiz_subs.order_by('sub_time')[len(quiz_subs) - len(quiz_questions):len(quiz_subs)]
+
+            # Calculates score
             score = 0
             for sub in recent_subs:
                 if sub.is_correct:
@@ -247,12 +277,10 @@ class ResultDetailsView(View):
         return HttpResponse(template.render(context, request))
 
     def post(self, request, quiz_id):
-        return HttpResponseRedirect(reverse('quiz:results'))
-
-class TestPageView(View):
-    def get(self, request):
-        template = loader.get_template('quiz/test.html')
-        context = {
-            'array': [1, 2, 3],
-        }
-        return HttpResponse(template.render(context, request))
+        # If the user is logging out then log them out
+        if 'logout' in request.POST.keys():
+            logout(request)
+            return HttpResponseRedirect(reverse('quiz:index'))
+        # Otherwise just open the results page
+        else:
+            return HttpResponseRedirect(reverse('quiz:results'))

@@ -19,37 +19,36 @@
   </head>
 
   <body>
-    {% if loggedIn %}
-      <div class = "container-fluid">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-          <a class="navbar-brand" href="">Quizzes</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
+    <div class = "container-fluid">
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Quizzes</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="/quiz">Home</a>
-              </li>
-              <li class="nav-item active">
-                <a class="nav-link" href="">Results</a>
-              </li>
-            </ul>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="">Results</a>
+            </li>
+          </ul>
 
-            <ul class="navbar-nav ml-auto">
-              <span class="navbar-text mx-2">
-                {{ user.username }}
-              </span>
+          <ul class="navbar-nav ml-auto">
+            <span class="navbar-text mx-2">
+              {{ user.username }}
+            </span>
 
-              <form method = "POST" class="form-inline my-2 my-lg-0">
-                {% csrf_token %}
-                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" name = "logout">Logout</button>
-              </form>
-            </ul>
-          </div>
-        </nav>
-      </div>
+            <form method = "POST" class="form-inline my-2 my-lg-0">
+              {% csrf_token %}
+              <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" name = "logout">Logout</button>
+            </form>
+          </ul>
+        </div>
+      </nav>
+    </div>
 
     <div class = "container">
       <div class = "page-header my-4">
@@ -58,43 +57,12 @@
       <p>Please choose which quiz you want to see your results for.
       Note that the quizzes will only show up if you have taken them before.</p>
 
+      <!-- Displays each of the quizzes that the user has submitted to -->
       <ul class = "list-group">
         {% for quiz in quizzes %}
           <li class = "list-group-item"><a href = {{quiz.id}}>{{quiz.name}}</a></li>
         {% endfor %}
       </ul>
     </div>
-
-  {% else %}
-    <div class = "container">
-      <div class = "page-header my-4">
-        <h3>Welcome to the results index!</h3>
-      </div>
-      <p>Please log in to see your past quiz results.</p>
-      <form method = "POST">
-        {% csrf_token %}
-        {% if failed %}
-          <div class = "alert alert-danger">
-            Login information was incorrect.
-          </div>
-        {% endif %}
-        <div class = "form-group">
-          <label for = "inputUsername">Username</label>
-          <input type = "text" class = "form-control" name = "inputUsername" id = "inputUsername" />
-        </div>
-
-        <div class = "form-group">
-          <label for = "inputPassword">Password</label>
-          <input type = "password" class = "form-control" name = "inputPassword" id = "inputPassword" />
-        </div>
-
-        <button type = "submit" class = "btn btn-success" name = "login">Login</button>
-
-        <button type = "submit" class = "btn btn-success" name = "signup">Sign Up</button>
-
-      </form>
-    </div>
-
-  {% endif %}
   </body>
 </html>

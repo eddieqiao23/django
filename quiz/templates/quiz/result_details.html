@@ -32,7 +32,7 @@
   <body>
     <div class = "container-fluid">
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="">Quizzes</a>
+        <a class="navbar-brand" href="/">Quizzes</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -40,10 +40,10 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-              <a class="nav-link" href="/quiz">Home</a>
+              <a class="nav-link" href="/">Home</a>
             </li>
             <li class="nav-item active">
-              <a class="nav-link" href="/quiz/results">Results</a>
+              <a class="nav-link" href="/results">Results</a>
             </li>
           </ul>
 
@@ -66,6 +66,7 @@
         <h1 class = "my-3">Results</h1>
 
         <div class = "row">
+          <!-- Top row -->
           <div class = "col-sm-1">
             Problem
           </div>
@@ -83,6 +84,7 @@
           </div>
 
           {% for sub in recent_subs %}
+            <!-- For each of the questions afterwards, it has a row -->
             <div class = "col-sm-1">
               {{ forloop.counter }}
             </div>
@@ -108,37 +110,12 @@
         {% else %}
           <p class = "mt-3">This quiz does not exist.</p>
         {% endif %}
-
-        <form method = "POST">
-          {% csrf_token %}
-          <button type = "submit" class = "btn btn-primary">Return to Results Index</button>
-        </form>
       </div>
-
-
-
-
-      <!-- <h1>{{curr_quiz.name}} Results</h1>
-
-      {% for sub in recent_subs %}
-        Question {{forloop.counter}}: {{sub.question.question_statement}} <br /> <br />
-        You submitted {{sub.sub_answer}}.
-        The right answer was {{sub.question.answer}}.
-        {% if sub.is_correct %}
-          CORRECT
-        {% else %}
-          WRONG
-        {% endif %}
-        <br /> <br />
-      {% endfor %}
-      Score: {{score}}/{{recent_subs|length}}
-
-      <br /> <br />
-
+      <p>Score: {{score}}/{{recent_subs|length}}</p>
       <form method = "POST">
         {% csrf_token %}
-        <button type = "submit" class = "btn btn-primary">Return to Home</button>
-      </form> -->
+        <button type = "submit" class = "btn btn-primary">Return to Results Index</button>
+      </form>
     </div>
   </body>
 </html>
